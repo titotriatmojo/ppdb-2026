@@ -1,0 +1,118 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
+
+// Controllers Admin
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\SiswaController as AdminSiswaController;
+use App\Http\Controllers\Admin\PembayaranController as AdminPembayaranController;
+use App\Http\Controllers\Admin\PengumumanController as AdminPengumumanController;
+use App\Http\Controllers\Admin\JurusanController as AdminJurusanController;
+use App\Http\Controllers\Admin\AkunController as AdminAkunController;
+
+// Controllers siswa
+use App\Http\Controllers\siswa\DashboardController as SiswaDashboardController;
+use App\Http\Controllers\siswa\PendaftaranController;
+use App\Http\Controllers\siswa\PembayaranController as SiswaPembayaranController;
+use App\Http\Controllers\siswa\PengumumanController as SiswaPengumumanController;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
+use App\Models\siswa;
+use App\Models\Jurusan;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
+Route::get('/', function () {
+    if (Auth::check()) {
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('siswa.dashboard');
+    }
+    return redirect()->route('login');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    // Dashboard Admin
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Kelola Akun User (Verifikasi Pendaftaran Akun)
+    Route::get('/akun', [AdminAkunController::class, 'index'])->name('akun.index');
+    Route::post('/akun/{id}/verifikasi', [AdminAkunController::class, 'verifikasi'])->name('akun.verifikasi');
+    Route::delete('/akun/{id}', [AdminAkunController::class, 'destroy'])->name('akun.destroy');
+    
+    // Kelola siswa
+    Route::get('/siswa', [AdminSiswaController::class, 'index'])->name('siswa.index');
+    Route::get('/siswa/{id}', [AdminSiswaController::class, 'show'])->name('siswa.show');
+    Route::post('/siswa/{id}/verifikasi', [AdminSiswaController::class, 'verifikasi'])->name('siswa.verifikasi');
+    Route::patch('/siswa/{id}/status', [AdminSiswaController::class, 'updateStatus'])->name('siswa.updateStatus');
+    Route::delete('/siswa/{id}', [AdminSiswaController::class, 'destroy'])->name('siswa.destroy');
+    
+    // Kelola Pembayaran
+    Route::get('/pembayaran', [AdminPembayaranController::class, 'index'])->name('pembayaran.index');
+    Route::get('/pembayaran/{id}', [AdminPembayaranController::class, 'show'])->name('pembayaran.show');
+    Route::post('/pembayaran/{id}/verifikasi', [AdminPembayaranController::class, 'verifikasi'])->name('pembayaran.verifikasi');
+    Route::delete('/pembayaran/{id}', [AdminPembayaranController::class, 'destroy'])->name('pembayaran.destroy');
+    
+    // Kelola Pengumuman
+    Route::get('/pengumuman', [AdminPengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::get('/pengumuman/create', [AdminPengumumanController::class, 'create'])->name('pengumuman.create');
+    Route::post('/pengumuman', [AdminPengumumanController::class, 'store'])->name('pengumuman.store');
+    Route::get('/pengumuman/{id}', [AdminPengumumanController::class, 'show'])->name('pengumuman.show');
+    Route::get('/pengumuman/{id}/edit', [AdminPengumumanController::class, 'edit'])->name('pengumuman.edit');
+    Route::patch('/pengumuman/{id}', [AdminPengumumanController::class, 'update'])->name('pengumuman.update');
+    Route::delete('/pengumuman/{id}', [AdminPengumumanController::class, 'destroy'])->name('pengumuman.destroy');
+    
+    // Kelola Jurusan
+    Route::get('/jurusan', [AdminJurusanController::class, 'index'])->name('jurusan.index');
+    Route::get('/jurusan/create', [AdminJurusanController::class, 'create'])->name('jurusan.create');
+    Route::post('/jurusan', [AdminJurusanController::class, 'store'])->name('jurusan.store');
+    Route::get('/jurusan/{id}/edit', [AdminJurusanController::class, 'edit'])->name('jurusan.edit');
+    Route::patch('/jurusan/{id}', [AdminJurusanController::class, 'update'])->name('jurusan.update');
+    Route::delete('/jurusan/{id}', [AdminJurusanController::class, 'destroy'])->name('jurusan.destroy');
+});
+
+/*
+|--------------------------------------------------------------------------
+| siswa Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+    
+    // Dashboard siswa
+    Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
+    
+    // Pendaftaran
+    Route::get('/pendaftaran', [PendaftaranController::class, 'create'])->name('pendaftaran.create');
+    Route::post('/pendaftaran', [PendaftaranController::class, 'store'])->name('pendaftaran.store');
+    Route::get('/pendaftaran/status', [PendaftaranController::class, 'status'])->name('pendaftaran.status');
+    
+    // Pembayaran
+    Route::get('/pembayaran', [SiswaPembayaranController::class, 'index'])->name('pembayaran.index');
+    Route::get('/pembayaran/create', [SiswaPembayaranController::class, 'create'])->name('pembayaran.create');
+    Route::post('/pembayaran', [SiswaPembayaranController::class, 'store'])->name('pembayaran.store');
+    Route::get('/pembayaran/{id}', [SiswaPembayaranController::class, 'show'])->name('pembayaran.show');
+    
+    // Pengumuman
+    Route::get('/pengumuman', [SiswaPengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::get('/pengumuman/{id}', [SiswaPengumumanController::class, 'show'])->name('pengumuman.show');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
