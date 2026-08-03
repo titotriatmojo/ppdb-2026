@@ -13,12 +13,12 @@ class DatabaseSeeder extends Seeder
         // Create Admin
         User::create([
             'name' => 'Administrator',
-            'email' => 'admin@lsp.com',
+            'email' => 'admin@gmail.com',
             'password' => bcrypt('password'),
             'role' => 'admin',
             'status_akun' => 'aktif',
             'phone' => '081234567890',
-            'address' => 'Kantor Pusat LSP',
+            'address' => 'Kantor Pusat Bani Tamim',
             'email_verified_at' => now(),
         ]);
 

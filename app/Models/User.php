@@ -32,8 +32,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     public function siswa()
     {
-        return $this->hasOne(siswa::class);
+        // Parameter ke-2 & 3 memastikan pencarian relasi berdasarkan user_id di tabel siswas
+        return $this->hasOne(siswa::class, 'user_id', 'id');
     }
 }
