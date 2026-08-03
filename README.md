@@ -14,7 +14,7 @@ Aplikasi web untuk manajemen pendaftaran siswa baru menggunakan Laravel 12. Meny
 
 | Role  | Email               | Password |
 | ----- | ------------------- | -------- |
-| Admin | admin@lsp.com       | password |
+| Admin | admin@gmail.com     | password |
 | siswa | _(Register manual)_ | -        |
 
 ## Lisensi
