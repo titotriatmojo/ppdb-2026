@@ -36,7 +36,7 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo & Brand -->
                 <div class="flex items-center space-x-3">
-                    <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=50&h=50&fit=crop" 
+                    <img src="{{ asset('asset/masjid.jpeg') }}" 
                          alt="Logo" 
                          class="w-10 h-10 rounded-full shadow-md">
                     <div>
